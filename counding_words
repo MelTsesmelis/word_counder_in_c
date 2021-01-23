@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define NTHREADS 8;//for the specific machine (MAYBE YOU HAVE TO CHANGE THAT IF YOU HAVE LESS THAN 4 CORES)
+
 //declare function, their implementation is on end
 void *counter_words_of_file(); //This function is to count the words of a file
 int *word_seperators();//this function is to check if a character is on words operators (so help us to know when a word start and ends)
@@ -14,7 +16,14 @@ struct data
     int thread_counter; //to save the sum of threads
 }
 
-//main -driver function
+
+//initialize mutex
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+//initialize variable for thread-sumilation of threads in one file
+int sum=0;
+
+
+//MAIN -DRIVER FUNCTION
 int main (int argc, char *argv[]){
  printf("I am on counting words\n");
  
@@ -41,10 +50,6 @@ int main (int argc, char *argv[]){
   for (int i = 0; i < NTHREADS; i++){
     pthread_join(threads[i],NULL);
   }
- 
-  //calculation TO DO 
-
-
 
   
     /*
@@ -64,14 +69,21 @@ int main (int argc, char *argv[]){
     }
 
 
+
+
+   int size_of_output_file = sizeof(getpid) +strlen(argv[1]) +sizeof(sum);
+
     //write to output.txt file  TO DO 
+  
     
 
 
 return 0;
 }
 
-//implementations of functions bellow 
+
+
+//IMPLEMENTATIONS OF FUNCTIONS BELLOW 
 
 int *word_seperators(char character)
 {
@@ -93,10 +105,42 @@ int *word_seperators(char character)
   return 0; //so its not on operators (false)
 }
 
-void *counter_words_of_file()
+//calculate words of a file using threads and  word_seperators()
+void *counter_words_of_file(void* args)
 {
-  
-}
+  //take the data of the thread
+  data *data_args =args;
+  int number_of_thread= data_args->thread_counter;
+ //make a counter for words 
+  int counter;
+ //prepare limits to put them on for (because if i am on last thread i have to care about modulo)
+  int limit_down= number_of_thread*(strlen(data_args->buffer))/NTHREADS
+  int limit_up;
+  //so i am not on last thread
+  if( number_of_thread!=NTHREADS-1 || strlen(data_args->buffer)%NTHREADS==0)
+  {
+   limit_up=(number_of_thread+1)*(strlen(data_args->buffer/NTHREADS)) 
+  }else{ //so i am on last thread
+   limit_up= (number_of_thread+1)*(strlen(data_args->buffer/NTHREADS)) +(strlen(data_args->buffer)%NTHREADS -1)
+  }
+  //divides threads into pieces to calculate the sum of words
+   for (int i=limit_down;i<limit_up;i++)
+    {
+      if(!word_seperators(data_args->buffer[i] && word_seperator(data_args->buffer[i+1])))
+      {  //so we are on  last of the word and add the counter
+         counter++;
+      }
+    }
 
+    // "freeze" threads, to control threads we have to  let one thread at the time
+    pthread_mutex_lock(&mutex);
+    //and then let that thread to add on sum of counter
+    sum+=counter;
+    //and unlock - unfreeze threads
+    pthreads_mutex_unlock(&mutex);
+    //exit of thread
+    pthread_exit(NULL);
+}
+ 
 
 
