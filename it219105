@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
         //take the number of characters using read()
         number_of_characters= read(fd,buffer_for_name_of_file,buff,file_size); //so now buffer has the characters
        
-       
+
        
         /*
         use buffer (buff) to take characters and
@@ -191,7 +191,7 @@ int main (int argc, char *argv[])
       
 
     //take care for zombies processes, wait to end all the children!
-    int wait_all_children;
+    int wait_all_children=-1;//to go first time 
 
     while(wait_all_children<=0)
     {
@@ -209,7 +209,7 @@ int main (int argc, char *argv[])
 return 0;
 }
 
-
+//FUNCIONTS for error hadling
 void handle_sigterm(int signal) 
 { 
     printf("\n\tIgnored signal %d\n", signal); 
