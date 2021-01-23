@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//declare function, their implementation is on end
+void *word_counter(); //TO DO 
+
+
+
+//take number of thread and the buffer(so what it has to read)
+struct data
+{
+    char *buffer;
+    int thread_counter;
+
+  .....
+}
+
+
+
+//main -driver function
+int main (int argc, char *argv[]){
+ printf("I am on counting words\n");
+ 
+ //ininialize threads-array
+ pthread_t threads[NTHREADS];
+ 
+ 
+//use data to take an array for threads 
+ data count[NTHREADS];
+  for (int i = 0; i < NTHREADS; i++)
+    {
+      count[i]=i; //TO DO 
+      pthread_create(&threads[i], NULL, thread_func, &count[i]);
+       
+    }
+  printf ("After thread creation...\n");
+
+  //wait all threads to complete 
+  for (int i = 0; i < NTHREADS; i++){
+    pthread_join(threads[i],NULL);
+  }
+  //end
+
+    /*
+        permissions is like  
+        r-- ->4                 so i want 644 to give rw--w--w-
+        -w- ->2
+        --x -<1
+    */
+    if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)
+    {
+        //Print to user the corresponding message
+        perror("");
+        //exiting from the program
+        exit(1);
+
+    }
+
+
+return 0;
+}
