@@ -20,7 +20,7 @@ struct data
 //initialize mutex
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 //initialize variable for thread-sumilation of threads in one file
-int sum=0;
+int total_number=0;
 
 
 //MAIN -DRIVER FUNCTION
@@ -70,12 +70,13 @@ int main (int argc, char *argv[]){
 
 
 
-
+   //find the size of output.txt to write
    int size_of_output_file = sizeof(getpid) +strlen(argv[1]) +sizeof(sum);
-
-    //write to output.txt file  TO DO 
-  
-    
+   //make a buffer to save there the informations
+   char buffer_output(size_of_output_file)
+   //write to output.txt file  TO DO 
+   snprintf(buffer_output,number_of_output_file,"%d,%s,%d\n",getpid(),argv[1],total_number);
+   write(fp.buffer_output,strlen(buffer_output);
 
 
 return 0;
@@ -125,7 +126,7 @@ void *counter_words_of_file(void* args)
   }
   //divides threads into pieces to calculate the sum of words
    for (int i=limit_down;i<limit_up;i++)
-    {
+    { //if i have "meletis  " i have to add 1 word no 3 (with spaces)...so i need "meletis  k"
       if(!word_seperators(data_args->buffer[i] && word_seperator(data_args->buffer[i+1])))
       {  //so we are on  last of the word and add the counter
          counter++;
@@ -135,7 +136,7 @@ void *counter_words_of_file(void* args)
     // "freeze" threads, to control threads we have to  let one thread at the time
     pthread_mutex_lock(&mutex);
     //and then let that thread to add on sum of counter
-    sum+=counter;
+    total_number+=counter;
     //and unlock - unfreeze threads
     pthreads_mutex_unlock(&mutex);
     //exit of thread
