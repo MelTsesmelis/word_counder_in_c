@@ -53,7 +53,7 @@ int main (int argc, char *argv[]){
         -w- ->2
         --x -<1
     */
-    int fd;
+    int fd;//initialize file distributor
     if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)//we want to write, create (if its not yet) or append that file
     {
         //in case that something goes wrong print a message
@@ -70,3 +70,33 @@ int main (int argc, char *argv[]){
 
 return 0;
 }
+
+//implementations of functions bellow 
+
+int *word_seperators(char character)
+{
+ /*unprintable and printable  characters, to be sure that will not take operator as word for syntax mistakes 
+    like "hello ! , @ " has to be 1 word no 4 etc
+    for '\' we have to put a \ more to cancel the special meaning
+  */
+  if( character==' ' ||character=='\n'||character=='\t'||character=='\0'
+    ||character==',' ||character=='!' ||character=='`' ||character=='('
+    ||character==')' ||character=='{' ||character=='}' ||character=='['
+    ||character==']' ||character=='+' ||character=='-' ||character=='>'
+    ||character=='<' ||character=='.' ||character=='%' ||character=='@' 
+    ||character=='*' ||character=='$' ||character=='^' ||character=='*'
+    ||character=='\\'||character=='~' ||character=='/' ||character=='"'
+    ||character==';' ||character=="?" ||character=='€' ||character=='&')  
+  {
+    return 1; //so yeah, we are on operators that we want to ignore  (true)
+  }
+  return 0; //so its not on operators (false)
+}
+
+void *counter_words_of_file()
+{
+  
+}
+
+
+
