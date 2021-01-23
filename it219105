@@ -60,6 +60,7 @@ int main (int argc, char *argv[])
     pid_t pid,ppid;
 
 
+
     //I use readdir to read  this directory 
     while ((pde = readdir(folder)) != NULL)
     {
@@ -80,6 +81,8 @@ int main (int argc, char *argv[])
             printf("\t%s: it`s not a file!\n",pde->d_name);
             continue;
         }
+
+     
 
         //open each file
         fd=open(buffer_for_name_of_file, O_RDONLY); //we need Read only 
@@ -104,7 +107,10 @@ int main (int argc, char *argv[])
         //create a buffer to help us read the number of characters
         char buff[file_size];
         //take the number of characters using read()
-        number_of_characters= read(fd,buff,file_size); //so now buffer has the characters
+        number_of_characters= read(fd,buffer_for_name_of_file,buff,file_size); //so now buffer has the characters
+       
+       
+       
         /*
         use buffer (buff) to take characters and
         check if each of them is on ASCII table.
@@ -173,9 +179,6 @@ int main (int argc, char *argv[])
             //sleep(10);
         }
 
-    
-
-    
 
      //close file 
       if(close(fd)<0)
