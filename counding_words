@@ -2,20 +2,17 @@
 #include <stdlib.h>
 
 //declare function, their implementation is on end
-void *word_counter(); //TO DO 
+void *counter_words_of_file(); //This function is to count the words of a file
+int *word_seperators();//this function is to check if a character is on words operators (so help us to know when a word start and ends)
 
 
 
 //take number of thread and the buffer(so what it has to read)
 struct data
 {
-    char *buffer;
-    int thread_counter;
-
-  .....
+    char *buffer; //we use the buffer to take the characters 
+    int thread_counter; //to save the sum of threads
 }
-
-
 
 //main -driver function
 int main (int argc, char *argv[]){
@@ -27,10 +24,15 @@ int main (int argc, char *argv[]){
  
 //use data to take an array for threads 
  data count[NTHREADS];
+ 
   for (int i = 0; i < NTHREADS; i++)
     {
-      count[i]=i; //TO DO 
-      pthread_create(&threads[i], NULL, thread_func, &count[i]);
+      /*remember that in it219105.c i used  a pointer array args
+      and in second cell i put the buffer to take the characters
+      */
+      count[i].buffer=argv[2]; //so i take characters
+      count[i].thread_counter=i; //i take the number of threads
+      pthread_create(&threads[i], NULL, &counter_words_of_file, (void*)&(count[i]));
        
     }
   printf ("After thread creation...\n");
@@ -39,22 +41,31 @@ int main (int argc, char *argv[]){
   for (int i = 0; i < NTHREADS; i++){
     pthread_join(threads[i],NULL);
   }
-  //end
+ 
+  //calculation TO DO 
 
+
+
+  
     /*
         permissions is like  
         r-- ->4                 so i want 644 to give rw--w--w-
         -w- ->2
         --x -<1
     */
-    if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)
+    int fd;
+    if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)//we want to write, create (if its not yet) or append that file
     {
-        //Print to user the corresponding message
+        //in case that something goes wrong print a message
         perror("");
-        //exiting from the program
+        //exit of the program
         exit(1);
- 
+
     }
+
+
+    //write to output.txt file  TO DO 
+    
 
 
 return 0;
