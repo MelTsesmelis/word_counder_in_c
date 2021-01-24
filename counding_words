@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+ 
 #define NTHREADS 8;//for the specific machine (MAYBE YOU HAVE TO CHANGE THAT IF YOU HAVE LESS THAN 4 CORES)
 
 //declare function, their implementation is on end
