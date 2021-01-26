@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <sys/file.h>
+#include <unistd.h>
+#include <string.h>
+#include <error.h>
+
+
+#define NTHREADS 8 //for the specific machine (MAYBE YOU HAVE TO CHANGE THAT IF YOU HAVE LESS THAN 4 CORES)
+
+
+
+
+//declare function, their implementation is on end
+void *counter_words_of_file(void*); //This function is to count the words of a file
+int word_seperators(char);//this function is to check if a character is on words operators (so help us to know when a word start and ends)
+
+
+
+
+//initialize mutex
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+
+//take number of thread and the buffer(so what it has to read)
+struct data
+{
+    char *buffer; //we use the buffer to take the characters 
+    int thread_counter; //to save the sum of threads
+};
+
+
+
+//initialize variable for thread-sumilation of threads in one file
+int total_number=0;
+
+
+//MAIN -DRIVER FUNCTION
+int main (int argc, char *argv[]){
+ printf("I am on counting words\n");
+ 
+//ininialize threads-array
+pthread_t threads[NTHREADS];
+ 
+ 
+//use data to take an array for threads 
+ struct data count[NTHREADS];
+ 
+  for (int i = 0; i < NTHREADS; i++)
+    {
+      /*remember that in it219105.c i used  a pointer array args
+      and in second cell i put the buffer to take the characters
+      */
+      count[i].buffer=argv[2]; //so i take characters
+      count[i].thread_counter=i; //i take the number of threads
+      pthread_create(&threads[i], NULL, &counter_words_of_file, (void*)&(count[i]));
+       
+    }
+  printf("After thread creation...\n");
+
+
+  //wait all threads to complete 
+  for (int i = 0; i < NTHREADS; i++){
+    pthread_join(threads[i],NULL);
+  }
+
+  
+    /*
+        permissions is like  
+        r-- ->4                 so i want 644 to give rw--w--w-
+        -w- ->2
+        --x -<1
+    */
+    int fd;//initialize file distributor
+    if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)//we want to write, create (if its not yet) or append that file
+    {
+        //in case that something goes wrong print a message
+        perror("");
+        //exit of the program
+        exit(1);
+
+    }
+
+
+  printf("i am after open\n");
+   //find the size of output.txt to write
+   int size_of_output_file = sizeof(getpid) +strlen(argv[1]) +sizeof(total_number);
+   //make a buffer to save there the informations
+   char buffer_output[size_of_output_file];
+   //write to output.txt file  TO DO 
+   snprintf(buffer_output,size_of_output_file,"%d,%s,%d\n",getpid(),argv[1],total_number);
+   write(fd,buffer_output,strlen(buffer_output));
+
+  printf("i am after write\n");
+return 0;
+}
+
+
+
+//IMPLEMENTATIONS OF FUNCTIONS BELLOW 
+
+int word_seperators(char character)
+{
+ /*unprintable and printable  characters, to be sure that will not take operator as word for syntax mistakes 
+    like "hello ! , @ " has to be 1 word no 4 etc
+    for '\' we have to put a \ more to cancel the special meaning
+  */
+  if( character==' ' ||character=='\n'||character=='\t'||character=='\0'
+    ||character==',' ||character=='!' ||character=='`' ||character=='('
+    ||character==')' ||character=='{' ||character=='}' ||character=='['
+    ||character==']' ||character=='+' ||character=='-' ||character=='>'
+    ||character=='<' ||character=='.' ||character=='%' ||character=='@' 
+    ||character=='*' ||character=='^' ||character=='*' ||character=='"'
+    ||character=='\\'||character=='~' ||character=='/' ||character==';'
+    ||character=='&')  
+  {
+    return 1; //so yeah, we are on operators that we want to ignore  (true)
+  }
+  return 0; //so its not on operators (false)
+}
+
+
+
+//calculate words of a file using threads and  word_seperators()
+void *counter_words_of_file(void* args)
+{
+  //take the data of the thread
+  struct data *data_args =args;
+  int number_of_thread= data_args->thread_counter;
+ //make a counter for words 
+  int counter;
+ //prepare limits to put them on for (because if i am on last thread i have to care about modulo)
+  int limit_down= number_of_thread*(strlen(data_args->buffer))/NTHREADS;
+  int limit_up;
+  //so i am not on last thread
+  if( number_of_thread!=NTHREADS-1 || strlen(data_args->buffer)%NTHREADS==0)
+  {
+   limit_up=(number_of_thread+1)*(strlen(data_args->buffer)/NTHREADS) ;
+  }else{ //so i am on last thread
+   limit_up= (number_of_thread+1)*(strlen(data_args->buffer)/NTHREADS) +(strlen(data_args->buffer)%NTHREADS -1);
+  }
+  //divides threads into pieces to calculate the sum of words
+   for (int i=limit_down;i<limit_up;i++)
+    { //if i have "meletis  " i have to add 1 word no 3 (with spaces)...so i need "meletis  k"
+      if(!word_seperators(data_args->buffer[i] && word_seperators(data_args->buffer[i+1])))
+      {  //so we are on  last of the word and add the counter
+         counter++;
+      }
+    }
+
+    // "freeze" threads, to control threads we have to  let one thread at the time
+    pthread_mutex_lock(&mutex);
+    //and then let that thread to add on sum of counter
+    total_number+=counter;
+    //and unlock - unfreeze threads
+    pthread_mutex_unlock(&mutex);
+    //exit of thread
+    pthread_exit(NULL);
+}
+ 
+
+
