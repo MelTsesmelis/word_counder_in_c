@@ -60,14 +60,14 @@ int main (int argc, char *argv[])
     int number_of_characters; //use it to take the number of characters
     long file_size; //use it to take the size of each file 
     pid_t pid,ppid;
-
+    int forks=0;//sum of forks, so i can check for zombies
+    int wait_all_children=0;
 
 
     //I use readdir to read  this directory 
     while ((pde = readdir(folder)) != NULL)
     {
          printf("%s\n", pde->d_name); 
-
         //so now i have the names of whatever is inside of folder, one under the other. 
         name_of_file= pde->d_name;
         //use strlen to find the size of string-name of file 
@@ -93,10 +93,10 @@ int main (int argc, char *argv[])
             perror("open");
             exit(1);
         }
-        printf("\tsuccessfully opened the fd=%d \n",fd);
+       // printf("\tsuccessfully opened the fd=%d \n",fd);
   
        //calculate file size with lseek use
-       file_size= lseek(fd,0,SEEK_END); //now cursor accessed the entire file and stayed at end of it 
+        file_size= lseek(fd,0,SEEK_END); //now cursor accessed the entire file and stayed at end of it 
         if(file_size==0)
         {
            printf("\tEmpty file!");
@@ -159,7 +159,10 @@ int main (int argc, char *argv[])
         for each  file (if a file is on this line
         then sure is on ascii)
        */
+         forks++;
         pid=fork();
+       
+
         if(pid<0) //check for fail creation
         {
             perror("creation of a child process was unsuccessful\n");
@@ -167,17 +170,11 @@ int main (int argc, char *argv[])
         }
         //check if returned child or parent
         if(pid==0)//child
-        {   //sleep(50);
-            //printf("\tReturned to the newly created child process.\n");
+        { 
             //use execv to replaxe the prosses with another, and count the words of the file
             execv(args[0],args);
-        }else{ //parent
-          //  printf("\tReturned to parent or caller.\n");
-            wait(NULL); //wait for child
-           // printf("\tParent pid = %d\n", getpid()); 
-          //  printf("\tChild pid = %d\n", getppid());
-        
-       
+        }else{ //parent 
+            //wait(NULL);
             //use signal for hadling
             signal(SIGINT, handle_sigint); 
 		    signal(SIGTERM,handle_sigterm);
@@ -195,21 +192,22 @@ int main (int argc, char *argv[])
     }
       
 
-    /*//take care for zombies processes, wait to end all the children!
-    int wait_all_children;
-
-    while(wait_all_children<=0)
+   /* //take care for zombies processes, wait to end all the children!
+    wait_all_children=0;
+    
+    while(wait_all_children++<forks)
     {
-        wait_all_children=wait(NULL);
-        //remember that ECHILD has value 10, for no children
-        if(wait_all_children==-1 && errno!=10)
-        {
-           puts("Something went wrong while we waiting childer to end");
-           exit(1);   
-        }
+        wait(NULL);
     }
     */
+     printf("forks=%d\n",forks);
+    for(int i=0;i<forks;i++){
+        wait(NULL);
+    }
+    printf("forks after=%d\n",forks);
+    printf("i am after wait null\n");
      closedir(folder);
+     exit(1);
 return 0;
 }
 
