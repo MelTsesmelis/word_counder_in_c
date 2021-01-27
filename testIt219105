@@ -12,7 +12,7 @@
 //declare function, their implementation is on end
 void handle_sigint(int);
 void handle_sigterm(int);
-x   
+
 int main (int argc, char *argv[])
 {
 
@@ -150,6 +150,8 @@ int main (int argc, char *argv[])
         -> the buffer of that file
         ->null, to mark the end of the array of pointers
       */
+        printf("nameBuffer %s\n",buffer_for_name_of_file);
+        printf("buff %s\n",buff);
         char *args[]={"./counting_words",buffer_for_name_of_file,buff,NULL};
 
        /*
@@ -165,21 +167,21 @@ int main (int argc, char *argv[])
         }
         //check if returned child or parent
         if(pid==0)//child
-        {
-            printf("\tReturned to the newly created child process.\n");
+        {   //sleep(50);
+            //printf("\tReturned to the newly created child process.\n");
             //use execv to replaxe the prosses with another, and count the words of the file
             execv(args[0],args);
         }else{ //parent
-            printf("\tReturned to parent or caller.\n");
+          //  printf("\tReturned to parent or caller.\n");
             wait(NULL); //wait for child
-            printf("\tParent pid = %d\n", getpid()); 
-            printf("\tChild pid = %d\n", getppid());
+           // printf("\tParent pid = %d\n", getpid()); 
+          //  printf("\tChild pid = %d\n", getppid());
         
        
-            // use signal to igno
+            //use signal for hadling
             signal(SIGINT, handle_sigint); 
 		    signal(SIGTERM,handle_sigterm);
-            //sleep(10);
+            signal(SIGCHLD,SIG_IGN);
         }
 
 
@@ -189,11 +191,11 @@ int main (int argc, char *argv[])
           perror("\tUnexpected error!Something went wrong with close.");
           exit(1);
       }
-       printf("\tsuccessfully closed the fd=%d \n",fd);
+       //printf("\tsuccessfully closed the fd=%d \n",fd);
     }
       
 
-    //take care for zombies processes, wait to end all the children!
+    /*//take care for zombies processes, wait to end all the children!
     int wait_all_children;
 
     while(wait_all_children<=0)
@@ -206,13 +208,12 @@ int main (int argc, char *argv[])
            exit(1);   
         }
     }
-
-
-      closedir(folder);
+    */
+     closedir(folder);
 return 0;
 }
 
-
+//FUNCTIONS FOR ERROR HANDLING
 void handle_sigterm(int signal) 
 { 
     printf("\n\tIgnored signal %d\n", signal); 
