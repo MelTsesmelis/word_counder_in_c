@@ -8,7 +8,12 @@
 #include <string.h>
 #include <error.h>
 
-#define NTHREADS 8
+#define NTHREADS 8  /*maybe you have to change that, based in my system.
+                   In case your system can't manage at the same time 8 threads               
+                   Then low that number. Or put a greater if your system can 
+                    use them     
+                   */
+
 
 //make a struct to take number of thread and the buffer(so what it has to read)
 typedef struct dataS data;
@@ -90,6 +95,10 @@ int main(int argc, char *argv[])
 }       
 
 //FUNCTIONS IMPLEMENTATIONS
+/*I take as words only patterns of letters. For example: “meletis !” is one 
+Word or “meletis 219105!” is one word. The reason is that I want more realistic and meaningful counting and I don't want take as words syntax mistakes of user   
+Like “Hello my friend , today …” commas etc isn`t words.*/
+
 int word_seperator(char character)
 {
     if(character==' ' ||character=='\n'||character=='\t'||character=='\0'
