@@ -9,7 +9,7 @@
 #include <error.h>
 
 
-#define NTHREADS 16 //for the specific machine (MAYBE YOU HAVE TO CHANGE THAT)
+#define NTHREADS 10//for the specific machine (MAYBE YOU HAVE TO CHANGE THAT)
 
 
 
@@ -39,7 +39,7 @@ int total_number=0;
 
 //MAIN -DRIVER FUNCTION
 int main (int argc, char *argv[]){
- printf("I am on counting words\n");
+ printf("I am on counting words\n\n");
  
 //ininialize threads-array
 pthread_t threads[NTHREADS];
@@ -91,9 +91,9 @@ pthread_t threads[NTHREADS];
    //printf("size of output file is %d\n",size_of_output_file);
    //printf("sizeof(getpid()=%ld\n",sizeof(getpid()));
   // printf("strlen(argv[1])=%ld",strlen(argv[1]));
-   printf("sizeof(total_number)=%ld\n",sizeof(total_number));
-   printf("argv[0]=%s\n",argv[0]);
-   printf("argv[1]=%s\n",argv[1]);
+  // printf("sizeof(total_number)=%ld\n",sizeof(total_number));
+  // printf("argv[0]=%s\n",argv[0]);
+   //printf("argv[1]=%s\n",argv[1]);
   // printf("argv[2]=%s\n",argv[2]);
   // printf("argv[3]=%s\n",argv[3]);
  
@@ -151,12 +151,15 @@ void *counter_words_of_file(void* args)
   if( number_of_thread!=NTHREADS-1 ||strlen(data_args->buffer)%NTHREADS==0)
   {
    limit_up=(number_of_thread+1)*(strlen(data_args->buffer)/NTHREADS);
-  }else{ //so i am on last thread
-   limit_up= (number_of_thread+1)*(strlen(data_args->buffer)/NTHREADS) +(strlen(data_args->buffer)%NTHREADS -1);
+    printf("limit_up is: %d\n",limit_up);
+  }else{ //so i am on last thread and modulo is not zero
+   limit_up=( (number_of_thread+1)*(strlen(data_args->buffer)/NTHREADS) +(strlen(data_args->buffer)%NTHREADS) -1);
+   printf("limit_up on last is: %d\n",limit_up);
   }
   //divides threads into pieces to calculate the sum of words
    for (int i=limit_down;i<limit_up;i++)
     { //if i have "meletis  " i have to add 1 word no 3 (with spaces)...so i need "meletis  k"
+    // or " meletis 134 #$%@!*&+_<>?:"{}|/_" its 1 word
       if(!word_seperators(data_args->buffer[i]) && word_seperators(data_args->buffer[i+1]))
       {  //so we are on  last of the word and add the counter
          counter++;
