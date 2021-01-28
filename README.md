@@ -4,4 +4,4 @@ make
 ## no argument
 ./it219105 
 ### argument
-./it219105 <directory>
+./it219105 (directory)
