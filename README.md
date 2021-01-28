@@ -1,3 +1,2 @@
 # word_counder_in_c
-KALHSPERAAAAA
-GEIAAAAAAAAAAAA
+
