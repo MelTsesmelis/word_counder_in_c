@@ -1,7 +1,7 @@
 # word_counder_in_c
 #EXECUTION
 make
-## no arguments
+## no argument
 ./it219105 
-### arguments
+### argument
 ./it219105 <directory>
