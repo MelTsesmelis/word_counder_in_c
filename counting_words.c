@@ -161,5 +161,5 @@ void *counter_words_of_file(void *data_args)
 
     //exit of thread
     pthread_exit (NULL);
-    
+     
 }
