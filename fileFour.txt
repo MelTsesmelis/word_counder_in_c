@@ -1,6 +1,0 @@
-Hello my name is meletis tsesmelis. I am a student on harokopeio university (HUA).I have to sum the words of files in a directory using low level language C.
-	I ignore spaces and whatever else than letter.
-so numbers like 1234567890 and characters like !@#$%^&*()_+}{|":?></.
-(44)
-
-
