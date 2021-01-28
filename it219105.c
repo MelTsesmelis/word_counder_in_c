@@ -8,6 +8,8 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <signal.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 //declare function, their implementation is on end
 void handle_sigint(int);
@@ -54,7 +56,8 @@ int main (int argc, char *argv[])
     long file_size; //use it to take the size of each file 
     pid_t pid,ppid;
     int forks=0;//sum of forks, so i can check for zombies
-
+    struct stat stat_buffer;
+   
 
 
     //I use readdir to read  this directory 
@@ -64,12 +67,13 @@ int main (int argc, char *argv[])
         //so now i have the names of whatever is inside of folder, one under the other. 
         name_of_file= pde->d_name;
         //use strlen to find the size of string-name of file 
-        name_of_file_has_size=strlen(dir) +1/*for new line*/ +strlen(name_of_file);  
+        name_of_file_has_size=strlen(dir) +1/*for backslash*/ +strlen(name_of_file);  
         //make a buffer for this string 
         char buffer_for_name_of_file[name_of_file_has_size];
         //use sprintf to printf a string (for that is the s on start)
         sprintf(buffer_for_name_of_file,"%s/%s",dir,name_of_file);
         //use opendir to check if it is a file
+        
         check_is_file= opendir(buffer_for_name_of_file);
         if(check_is_file!=NULL) // so it`s not a file, go on next
         {
@@ -77,7 +81,6 @@ int main (int argc, char *argv[])
             continue;
         }
 
-     
 
         //open each file
         fd=open(buffer_for_name_of_file, O_RDONLY); //we need Read only 
@@ -118,6 +121,7 @@ int main (int argc, char *argv[])
              if(buff[i]<0||buff[i]>127)//so it`s out of ASCII
             {
                  found_no_Ascii=1;
+                 i+=file_size-i; //so if you find one go on end, it`s enough
             }
         }
         // printf("file size is %ld",file_size);
@@ -168,7 +172,6 @@ int main (int argc, char *argv[])
             //use signal for hadling
             signal(SIGINT, handle_sigint); 
 		    signal(SIGTERM,handle_sigterm);
-            signal(SIGCHLD,SIG_IGN);
         }
 
      //close file 
