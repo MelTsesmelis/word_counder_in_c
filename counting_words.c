@@ -10,8 +10,8 @@
 
 #define NTHREADS 8  /*maybe you have to change that, based in my system.
                    In case your system can't manage at the same time 8 threads               
-                   Then low that number. Or put a greater if your system can 
-                    use them     
+                   Then low that number. Or put a greater if your system and cores can 
+                    use them.
                    */
 
 
@@ -79,14 +79,15 @@ int main(int argc, char *argv[])
         --x -<1
     */
     //create an output file and write on it... if already exists append that
-    if ((fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 ))==-1)
+    fd=open("output.txt",O_WRONLY | O_CREAT | O_APPEND,0644 );
+    if (fd==-1)
     {
-        perror("");
-        exit(1);
+        perror("open");
+        exit(-1);
     }
 
     //prepare the format of text we will print on output file
-    snprintf(buffer_output,size_of_output_file,"%d, %s, %d\n",getpid(),argv[1],total_number);
+    sprintf(buffer_output,"%d, %s, %d\n",getpid(),argv[1],total_number);
 
     //write the array of characters in the file
     write(fd, buffer_output, strlen(buffer_output)); 
@@ -101,18 +102,18 @@ Like “Hello my friend , today …” commas etc isn`t words.*/
 
 int word_seperator(char character)
 {
-    if(character==' ' ||character=='\n'||character=='\t'||character=='\0'
-     ||character==',' ||character=='!' ||character=='`' ||character=='('
-     ||character==')' ||character=='{' ||character=='}' ||character=='['
-     ||character==']' ||character=='+' ||character=='-' ||character=='>'
-     ||character=='<' ||character=='.' ||character=='%' ||character=='@' 
-     ||character=='*' ||character=='^' ||character=='*' ||character=='"'
-     ||character=='~' ||character=='/' ||character==';' ||character=='&'
-     ||character=='#' ||character=='$' ||character=='_' ||character==':'
-     ||character=='0' ||character=='1' ||character=='2' ||character=='3'
-     ||character=='4' ||character=='5' ||character=='6' ||character=='7'
-     ||character=='?' ||character=='8' ||character=='9' ||character=='\\'
-     ||character=='|')
+     if(character==' ' ||character=='\n'||character=='\t'||character=='\0' //this line (first) is based on online program "word counter"
+      ||character==',' ||character=='!' ||character=='`' ||character=='('   //if you want to check it with that a specific text
+      ||character==')' ||character=='{' ||character=='}' ||character=='['   //then  ignore other lines
+      ||character==']' ||character=='+' ||character=='-' ||character=='>'
+      ||character=='<' ||character=='.' ||character=='%' ||character=='@' 
+      ||character=='*' ||character=='^' ||character=='*' ||character=='"'
+      ||character=='~' ||character=='/' ||character==';' ||character=='&'
+      ||character=='#' ||character=='$' ||character=='_' ||character==':'
+      ||character=='0' ||character=='1' ||character=='2' ||character=='3'
+      ||character=='4' ||character=='5' ||character=='6' ||character=='7'
+      ||character=='?' ||character=='8' ||character=='9' ||character=='\\'
+      ||character=='|')
     {
         return 1;//true,is a seperator
 
@@ -161,5 +162,5 @@ void *counter_words_of_file(void *data_args)
 
     //exit of thread
     pthread_exit (NULL);
-     
+    
 }
